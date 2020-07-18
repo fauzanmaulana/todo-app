@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import { ListItem, ListItemIcon, Checkbox, ListItemText, Grid, Button} from '@material-ui/core';
+import { ListItem, ListItemIcon, Checkbox, ListItemText, Grid, Button, Dialog, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
 import DeleteOutlinedIcon from '@material-ui/icons/DeleteOutlined';
 import db from '../firebase.js';
 
@@ -25,6 +25,9 @@ function Todo(props) {
         console.log(e.target)
     }
 
+    // * modal
+    const [open, setOpen] = useState(false)
+
     return (
         <div>
             <Grid container spacing={0}>
@@ -45,11 +48,28 @@ function Todo(props) {
                     </ListItem>
                 </Grid>
                 <Grid xs={2} style={{cursor: 'pointer'}}>
-                    <Button onClick={() => db.collection('todos').doc(props.id).delete()}>
+                    <Button onClick={() => setOpen(true)}>
                         <DeleteOutlinedIcon color='secondary' style={{margin: 15}}/>
                     </Button>
                 </Grid>
             </Grid>
+
+            <Dialog
+                open={open}
+                keepMounted
+                aria-labelledby="alert-dialog-slide-title"
+                aria-describedby="alert-dialog-slide-description"
+            >
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-slide-description" style={{textAlign: 'center'}}>
+                        you sure ?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpen(false)} color="secondary" size='small'>no</Button>
+                    <Button onClick={() => {(db.collection('todos').doc(props.id).delete()); (setOpen(false))}} color="primary" size='small'>yes</Button>
+                </DialogActions>
+            </Dialog>
         </div>
     )
 }
