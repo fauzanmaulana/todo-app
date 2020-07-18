@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import { ListItem, ListItemIcon, Checkbox, ListItemText, Grid, Button} from '@material-ui/core';
 import DeleteOutlinedIcon from '@material-ui/icons/DeleteOutlined';
+import db from '../firebase.js';
 
 function Todo(props) {
     
@@ -44,8 +45,8 @@ function Todo(props) {
                     </ListItem>
                 </Grid>
                 <Grid xs={2} style={{cursor: 'pointer'}}>
-                    <Button>
-                        <DeleteOutlinedIcon style={{margin: 15}}/>
+                    <Button onClick={() => db.collection('todos').doc(props.id).delete()}>
+                        <DeleteOutlinedIcon color='secondary' style={{margin: 15}}/>
                     </Button>
                 </Grid>
             </Grid>

@@ -12,9 +12,9 @@ function App() {
 
   useEffect(() => {
     db.collection('todos').orderBy('writed', 'desc').onSnapshot(snapshot => {
-      setList(snapshot.docs.map(doc => doc.data().todo))
+      setList(snapshot.docs.map(doc => ({id: doc.id, todo: doc.data().todo})))
     })
-  }, [])
+  }, []);
   
 
   const addList = e => {
@@ -40,7 +40,7 @@ function App() {
         <Button onClick={addList} disabled={!input} style={{margin: 7}} variant="outlined" color="primary" size="large" type="submit">Add</Button>
 
         <List>
-          {lists.map((value, index) => ( <Todo item={value} index={index}/> ))}
+          {lists.map((value, index) => ( <Todo item={value.todo} index={index} id={value.id}/> ))}
         </List>
         
       </form>
