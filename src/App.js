@@ -1,41 +1,33 @@
-import React, { useState } from 'react';
-import { TextField, Button, List, ListItem, ListItemIcon, Checkbox, ListItemText, Container } from '@material-ui/core';
-import DeleteOutlinedIcon from '@material-ui/icons/DeleteOutlined';
-import { makeStyles } from '@material-ui/core/styles';
+import React, { useState, useEffect } from 'react';
+import { TextField, Button, Container, List } from '@material-ui/core';
+import Todo from './component/Todo.js';
+import db from './firebase.js';
+import firebase from 'firebase'
 import './App.css';
 
 function App() {
 
-  const useStyles = makeStyles((item) => ({
-    btnmargin: {
-      margin: item.spacing(1)
-    }
-  }));
-
-  const classes = useStyles()
-
   const [lists, setList] = useState([])
   const [input, setInput] = useState('')
-  const [checked, setChecked] = useState([0])
+
+  useEffect(() => {
+    db.collection('todos').orderBy('writed', 'desc').onSnapshot(snapshot => {
+      setList(snapshot.docs.map(doc => doc.data().todo))
+    })
+  }, [])
+  
 
   const addList = e => {
     e.preventDefault()
+    db.collection('todos').add({
+      todo: input,
+      deadline: null,
+      finish: false,
+      writed: firebase.firestore.FieldValue.serverTimestamp()
+    })
     setList([...lists, input])
     setInput('')
   }
-
-  const handleToggle = (value) => () => {
-    const currentIndex = checked.indexOf(value);
-    const newChecked = [...checked];
-
-    if (currentIndex === -1) {
-      newChecked.push(value);
-    } else {
-      newChecked.splice(currentIndex, 1);
-    }
-
-    setChecked(newChecked);
-  };
 
   return (
     <div className="App">
@@ -45,27 +37,14 @@ function App() {
       <form>
         <TextField value={input} onChange={e => setInput(e.target.value)} id="list-input" label="write here.." variant="outlined" />
 
-        <Button onClick={addList} className={classes.btnmargin} variant="outlined" color="primary" size="large" type="submit">Add</Button>
+        <Button onClick={addList} disabled={!input} style={{margin: 7}} variant="outlined" color="primary" size="large" type="submit">Add</Button>
 
         <List>
-          {lists.map((value, index) => (
-            <ListItem key={index} role={undefined} dense onClick={handleToggle(value)}>
-            <ListItemIcon>
-              <Checkbox
-                edge="start"
-                checked={checked.indexOf(value) !== -1}
-                tabIndex={-1}
-                disableRipple
-                inputProps={{ 'aria-labelledby': `checkbox-list-label-${value}` }}
-              />
-            </ListItemIcon>
-            <ListItemText id={`checkbox-list-label-${value}`} primary={value} />
-            <DeleteOutlinedIcon/>
-          </ListItem>
-          ))}
+          {lists.map((value, index) => ( <Todo item={value} index={index}/> ))}
         </List>
         
       </form>
+
       </Container>
     </div>
   );
