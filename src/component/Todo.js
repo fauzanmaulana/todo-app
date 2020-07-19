@@ -1,12 +1,13 @@
 import React, {useState} from 'react'
-import { ListItem, ListItemIcon, Checkbox, ListItemText, Grid, Button, Dialog, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
+import { ListItem, ListItemIcon, Checkbox, ListItemText, Grid, Button, Dialog, DialogContent, DialogContentText, DialogActions, TextField } from '@material-ui/core';
 import DeleteOutlinedIcon from '@material-ui/icons/DeleteOutlined';
 import db from '../firebase.js';
 
 function Todo(props) {
     
+    // * handle toggle checkbox
     const [checked, setChecked] = useState([0])
-    const [changeList, setChangeList] = useState(true)
+    const [input, setInput] = useState('')
 
     const handleToggle = (item) => () => {
         const currentIndex = checked.indexOf(item);
@@ -21,12 +22,27 @@ function Todo(props) {
         setChecked(newChecked);
     }
 
-    const listChange = e => {
-        console.log(e.target)
-    }
-
     // * modal
     const [open, setOpen] = useState(false)
+
+    // * change list component
+    const [editInput, setEditInput] = useState(false)
+
+    const listChange = e => {
+        if(e.keyCode === 13){
+            db.collection('todos').doc(props.id).set({
+                todo: input
+            }, { merge: true })
+
+            setEditInput(false)
+        }else if(e.keyCode === 27){
+            setEditInput(false)
+        }
+    }
+
+    const openInput = () => {
+        setEditInput(true)
+    }
 
     return (
         <div>
@@ -43,8 +59,13 @@ function Todo(props) {
                             onClick={handleToggle(props.item)}
                         />
                         </ListItemIcon>
-                        <ListItemText id={`checkbox-list-label-${props.item}`} primary={props.item} 
-                        secondary={ "it is an deadline" } onClick={listChange}/>
+                        { editInput 
+
+                        ? <TextField id="edit-input" placeholder={`${props.item}.. (press esc to cancel)`} label="edit here.." autoFocus variant="outlined" onChange={e => setInput(e.target.value)} fullWidth={true} onKeyDown={listChange} /> 
+
+                        : <ListItemText id={`checkbox-list-label-${props.item}`} primary={props.item} 
+                        secondary={ "it is an deadline" } onClick={openInput} style={{cursor: 'pointer'}} /> }
+
                     </ListItem>
                 </Grid>
                 <Grid xs={2} style={{cursor: 'pointer'}}>
