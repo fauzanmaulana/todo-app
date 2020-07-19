@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Container, List } from '@material-ui/core';
+import { TextField, Button, Container, List, Grid } from '@material-ui/core';
 import Todo from './component/Todo.js';
 import db from './firebase.js';
 import firebase from 'firebase'
@@ -12,7 +12,7 @@ function App() {
 
   useEffect(() => {
     db.collection('todos').orderBy('writed', 'desc').onSnapshot(snapshot => {
-      setList(snapshot.docs.map(doc => ({id: doc.id, todo: doc.data().todo})))
+      setList(snapshot.docs.map(doc => ({id: doc.id, todo: doc.data().todo, finish: doc.data().finish})))
     })
   }, []);
   
@@ -22,7 +22,7 @@ function App() {
     db.collection('todos').add({
       todo: input,
       deadline: null,
-      finish: false,
+      finish: -1,
       writed: firebase.firestore.FieldValue.serverTimestamp()
     })
     setList([...lists, input])
@@ -33,14 +33,23 @@ function App() {
     <div className="App">
       <Container maxWidth="sm">
 
-      <h1>Write the things that you have todo bellow!</h1>
-      <form>
-        <TextField value={input} onChange={e => setInput(e.target.value)} id="list-input" label="write here.." variant="outlined" />
+      <h2>Write the things that you have todo bellow!</h2>
 
-        <Button onClick={addList} disabled={!input} style={{margin: 7}} variant="outlined" color="primary" size="large" type="submit">Add</Button>
+      <form>
+        <Grid container spacing={0}>
+
+          <Grid xs={10}>
+            <TextField value={input} onChange={e => setInput(e.target.value)} id="list-input" label="write here.." variant="outlined" fullWidth={true} />
+          </Grid>
+
+          <Grid xs={2}>
+            <Button onClick={addList} disabled={!input} style={{margin: 7}} variant="outlined" color="primary" size="large" type="submit">Add</Button>
+          </Grid>
+
+        </Grid>
 
         <List>
-          {lists.map((value, index) => ( <Todo item={value.todo} index={index} id={value.id}/> ))}
+          {lists.map((value, index) => ( <Todo item={value.todo} finish={value.finish} index={index} id={value.id}/> ))}
         </List>
         
       </form>

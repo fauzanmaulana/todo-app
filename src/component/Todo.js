@@ -6,26 +6,28 @@ import db from '../firebase.js';
 function Todo(props) {
     
     // * handle toggle checkbox
-    const [checked, setChecked] = useState([0])
-    const [input, setInput] = useState('')
+    const [finish, setFinish] = useState(-1)
 
-    const handleToggle = (item) => () => {
-        const currentIndex = checked.indexOf(item);
-        const newChecked = [...checked];
+    const handleToggle = id => () => {
+        db.collection('todos').doc(id).get()
+        .then((docRef) => { setFinish(docRef.data().finish) })
 
-        if (currentIndex === -1) {
-        newChecked.push(item);
-        } else {
-        newChecked.splice(currentIndex, 1);
+        if(finish === -1){
+            db.collection('todos').doc(id).set({
+                finish: 1
+            }, { merge: true })
+        }else{
+            db.collection('todos').doc(id).set({
+                finish: -1
+            }, { merge: true })
         }
-
-        setChecked(newChecked);
     }
 
     // * modal
     const [open, setOpen] = useState(false)
 
     // * change list component
+    const [input, setInput] = useState('')
     const [editInput, setEditInput] = useState(false)
 
     const listChange = e => {
@@ -40,10 +42,6 @@ function Todo(props) {
         }
     }
 
-    const openInput = () => {
-        setEditInput(true)
-    }
-
     return (
         <div>
             <Grid container spacing={0}>
@@ -51,12 +49,9 @@ function Todo(props) {
                     <ListItem key={props.index} role={undefined}>
                         <ListItemIcon>
                         <Checkbox
-                            edge="start"
-                            checked={checked.indexOf(props.item) !== -1}
-                            tabIndex={-1}
-                            disableRipple
-                            inputProps={{ 'aria-labelledby': `checkbox-list-label-${props.item}` }}
-                            onClick={handleToggle(props.item)}
+                            checked={ props.finish !== -1}
+                            color='primary'
+                            onClick={handleToggle(props.id)}
                         />
                         </ListItemIcon>
                         { editInput 
@@ -64,7 +59,7 @@ function Todo(props) {
                         ? <TextField id="edit-input" placeholder={`${props.item}.. (press esc to cancel)`} label="edit here.." autoFocus variant="outlined" onChange={e => setInput(e.target.value)} fullWidth={true} onKeyDown={listChange} /> 
 
                         : <ListItemText id={`checkbox-list-label-${props.item}`} primary={props.item} 
-                        secondary={ "it is an deadline" } onClick={openInput} style={{cursor: 'pointer'}} /> }
+                        secondary={ "it is an deadline" } onClick={() => setEditInput(true)} style={{cursor: 'pointer'}} /> }
 
                     </ListItem>
                 </Grid>
@@ -87,8 +82,8 @@ function Todo(props) {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setOpen(false)} color="secondary" size='small'>no</Button>
-                    <Button onClick={() => {(db.collection('todos').doc(props.id).delete()); (setOpen(false))}} color="primary" size='small'>yes</Button>
+                    <Button onClick={() => setOpen(false)} color="primary" size='small'>no</Button>
+                    <Button onClick={() => {(db.collection('todos').doc(props.id).delete()); (setOpen(false))}} color="secondary" size='small'>yes</Button>
                 </DialogActions>
             </Dialog>
         </div>
