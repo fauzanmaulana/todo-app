@@ -46,7 +46,7 @@ function Todo(props) {
         <div>
             <Grid container spacing={0}>
                 <Grid xs={10}>
-                    <ListItem key={props.index} role={undefined}>
+                    <ListItem key={props.id} role={undefined}>
                         <ListItemIcon>
                         <Checkbox
                             checked={ props.finish !== -1}

@@ -1,3 +1,30 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body{
+  overflow: hidden;
+}
+
+.title{
+  margin: 15px;
+}
+
 .App {
   text-align: center;
+}
+
+.container{
+  height: 90vh;
+}
+
+.todolist{
+  height: 80vh;
+}
+
+.todolistscroll{
+  height: 80vh;
+  overflow-y: scroll;
 }
