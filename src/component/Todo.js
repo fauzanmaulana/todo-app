@@ -4,6 +4,9 @@ import DeleteOutlinedIcon from '@material-ui/icons/DeleteOutlined';
 import db from '../firebase.js';
 
 function Todo(props) {
+
+    const date = new Date(props.writed * 1000);
+    const clock = ` | ${date.getHours()}:${date.getMinutes()}`
     
     // * handle toggle checkbox
     const [finish, setFinish] = useState(-1)
@@ -59,7 +62,7 @@ function Todo(props) {
                         ? <TextField id="edit-input" placeholder={`${props.item}.. (press esc to cancel)`} label="edit here.." autoFocus variant="outlined" onChange={e => setInput(e.target.value)} fullWidth={true} onKeyDown={listChange} /> 
 
                         : <ListItemText id={`checkbox-list-label-${props.item}`} primary={props.item} 
-                        secondary={ "it is an deadline" } onClick={() => setEditInput(true)} style={{cursor: 'pointer'}} /> }
+                        secondary={ String(date).substr(0, 10) + clock } onClick={() => setEditInput(true)} style={{cursor: 'pointer'}} /> }
 
                     </ListItem>
                 </Grid>

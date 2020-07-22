@@ -10,13 +10,18 @@ function App() {
 
   const [lists, setList] = useState([])
   const [input, setInput] = useState('')
-  let isSession = false
+  const [isSession, setIsSession] = useState(false)
+  const [todoId, setTodoId] = useState(0)
 
   useEffect(() => {
 
+    if(Cookies.get('lastNumber')){
+      setTodoId(Number(Cookies.get('lastNumber') + Number(1)))
+    }
+
     if(!Cookies.get('username')){
       const username = prompt('Masukan Username')
-      Cookies.set('username', username)
+      Cookies.set('username', username, { expires: 30 })
       db.collection('user').add({
         username: username,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -28,15 +33,15 @@ function App() {
     })
 
     const getTodoById = (todoId) => {
-      Cookies.set('id', todoId)
+      Cookies.set('id', todoId, { expires: 30 })
       mountedGetTodoById(Cookies.get('id'))
     }
     
     const mountedGetTodoById = (idTodo) => {
       db.collection('todos').where('userId', '==', idTodo).onSnapshot(snapshot => {
-        setList(snapshot.docs.map(doc => ({id: doc.id, todo: doc.data().todo, finish: doc.data().finish})))
+        setList(snapshot.docs.map(doc => ({id: doc.id, todo: doc.data().todo, finish: doc.data().finish, todoId: doc.data().idTodo, writed: doc.data().writed})))
       })
-      isSession = true
+      setIsSession(true)
     }
 
     if(isSession){
@@ -47,8 +52,11 @@ function App() {
 
   const addList = e => {
     e.preventDefault()
+    setTodoId(todoId + 1)
+    Cookies.set('lastNumber', Number(todoId), { expires: 30 })
     db.collection('todos').add({
       userId: Cookies.get('id'),
+      idTodo: todoId,
       todo: input,
       deadline: null,
       finish: -1,
@@ -58,17 +66,24 @@ function App() {
     setInput('')
   }
 
+  lists.sort((a, b) => parseFloat(a.todoId) - parseFloat(b.todoId));
+
+  lists.reverse()
+
   return (
     <div className="App">
 
-      <h2 className="title">Write the things that you have todo bellow!</h2>
+      <h2 className="title">hi! {Cookies.get('username')}, you can write any todo lists bellow :)</h2>
 
       <Container maxWidth="sm" className="container">
 
       <div className={lists.length > 7 ? "todolistscroll" : "todolist"}>
-        <List>
-          {lists.map((value, index) => ( <Todo item={value.todo} finish={value.finish} index={index} id={value.id}/> ))}
-        </List>
+        { lists.length <= 0 
+          ? <p style={{paddingTop: 60}}>nothing todo</p>
+          : <List>
+              {lists.map((value, index) => ( <Todo item={value.todo} finish={value.finish} index={index} id={value.id} writed={value.writed}/> ))}
+            </List>
+        }
       </div>
 
       <form>
