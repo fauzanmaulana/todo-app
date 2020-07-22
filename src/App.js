@@ -73,13 +73,12 @@ function App() {
   return (
     <div className="App">
 
-      <h2 className="title">hi! {Cookies.get('username')}, you can write any todo lists bellow :)</h2>
-
       <Container maxWidth="sm" className="container">
 
-      <div className={lists.length > 7 ? "todolistscroll" : "todolist"}>
+      <div className={lists.length > 6 ? "todolistscroll" : "todolist"}>
         { lists.length <= 0 
-          ? <p style={{paddingTop: 60}}>nothing todo</p>
+          ? <p>hi! {Cookies.get('username')}, you can write any todo lists bellow :)</p>
+
           : <List>
               {lists.map((value, index) => ( <Todo item={value.todo} finish={value.finish} index={index} id={value.id} writed={value.writed}/> ))}
             </List>

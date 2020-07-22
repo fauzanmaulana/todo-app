@@ -59,7 +59,7 @@ function Todo(props) {
                         </ListItemIcon>
                         { editInput 
 
-                        ? <TextField id="edit-input" placeholder={`${props.item}.. (press esc to cancel)`} label="edit here.." autoFocus variant="outlined" onChange={e => setInput(e.target.value)} fullWidth={true} onKeyDown={listChange} /> 
+                        ? <TextField id="edit-input" placeholder={`${props.item}.. (press any to cancel)`} label="edit here.." autoFocus variant="outlined" onChange={e => setInput(e.target.value)} fullWidth={true} onKeyDown={listChange} onBlur={() => setEditInput(false)}/> 
 
                         : <ListItemText id={`checkbox-list-label-${props.item}`} primary={props.item} 
                         secondary={ String(date).substr(0, 10) + clock } onClick={() => setEditInput(true)} style={{cursor: 'pointer'}} /> }

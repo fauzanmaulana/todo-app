@@ -4,20 +4,13 @@
   box-sizing: border-box;
 }
 
-body{
-  overflow: hidden;
-}
-
-.title{
-  margin: 15px 0;
-}
-
 .App {
   text-align: center;
 }
 
 .container{
-  height: 90vh;
+  margin-top: 5%;
+  height: 90%;
 }
 
 .todolist{
@@ -27,4 +20,8 @@ body{
 .todolistscroll{
   height: 80vh;
   overflow-y: scroll;
+}
+
+form{
+  margin: 7% 0 7% 0;
 }
